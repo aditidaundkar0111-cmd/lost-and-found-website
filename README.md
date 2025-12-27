@@ -129,13 +129,6 @@ When a match is found, users receive an email with:
 - Prevents spam and false reports
 - Ensures platform authenticity
 
-### 💬 Chatbot
-Quick answers to common questions:
-- How to report items
-- How matching works
-- Email notifications
-- Verification process
-
 ## Database Structure
 
 ### Users (users.json)

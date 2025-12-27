@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment
+venv/
+
+# Environment variables (secrets)
+.env
+
+# Uploaded images
+static/uploads/
+
+# Database files (JSON data)
+data/
+
+# OS files
+.DS_Store

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-12">
+
+    <h1 class="text-4xl font-bold text-indigo-600 mb-8">Admin Dashboard</h1>
+
+    <!-- Dashboard Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+            <h3 class="text-5xl font-bold text-orange-500 mb-2">{{ pending }}</h3>
+            <p class="text-gray-600 font-semibold mb-4">Pending Verification</p>
+            <a href="{{ url_for('admin_items') }}"
+               class="inline-block bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+                Review Items
+            </a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+            <h3 class="text-5xl font-bold text-green-500 mb-2">{{ verified }}</h3>
+            <p class="text-gray-600 font-semibold">Verified Items</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+            <h3 class="text-5xl font-bold text-blue-500 mb-2">{{ matched }}</h3>
+            <p class="text-gray-600 font-semibold">Items Reunited</p>
+        </div>
+
+    </div>
+
+    <!-- Quick Actions -->
+    <section class="bg-white rounded-lg shadow-lg p-8 mb-10">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">Quick Actions</h2>
+        <div class="flex flex-wrap gap-4">
+            <a href="{{ url_for('admin_items') }}"
+               class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">
+                Manage Items
+            </a>
+
+            <a href="{{ url_for('browse') }}"
+               class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700">
+                View Published Items
+            </a>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
+

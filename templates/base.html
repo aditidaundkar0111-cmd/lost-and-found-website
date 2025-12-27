@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Lost and Found platform to help reunite lost items with their owners">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Lost & Found{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="bg-white">
+
+    <!-- NAVBAR -->
+    <nav class="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 text-2xl font-bold">
+                <span class="text-xl">🔍</span>
+                <span>Lost & Found</span>
+            </div>
+            <ul class="hidden md:flex gap-6 items-center">
+                <li>
+                    <a href="{{ url_for('home') }}"
+                       class="hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md transition">
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('browse') }}"
+                       class="hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md transition">
+                        Browse
+                    </a>
+                </li>
+                {% if session.user_email %}
+                    <li>
+                        <a href="{{ url_for('report') }}"
+                           class="hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md transition">
+                            Report Item
+                        </a>
+                    </li>
+                    <li class="relative group">
+                        <a href="#"
+                           class="hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md transition">
+                            {{ session.user_name }} ▼
+                        </a>
+                        <ul class="hidden group-hover:block absolute top-full left-0 bg-white text-gray-800 rounded-md shadow-lg min-w-max z-50">
+                            {% if session.is_admin %}
+                                <li>
+                                    <a href="{{ url_for('admin_dashboard') }}"
+                                       class="block px-4 py-2 hover:bg-gray-100">
+                                        Admin Dashboard
+                                    </a>
+                                </li>
+                            {% endif %}
+                            <li>
+                                <a href="#" onclick="showMyItems()"
+                                   class="block px-4 py-2 hover:bg-gray-100">
+                                    My Items
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('logout') }}"
+                                   class="block px-4 py-2 hover:bg-gray-100">
+                                    Logout
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{{ url_for('login') }}"
+                           class="hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md transition">
+                            Login
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('register') }}"
+                           class="border-2 border-white px-3 py-2 rounded-md hover:bg-white hover:text-indigo-600 transition">
+                            Register
+                        </a>
+                    </li>
+                {% endif %}
+                <li>
+                    <a href="{{ url_for('contact') }}"
+                       class="hover:bg-white hover:bg-opacity-20 px-3 py-2 rounded-md transition">
+                        Contact Us
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- PAGE CONTENT -->
+    {% block content %}{% endblock %}
+
+    <!-- FOOTER (MINIMAL) -->
+    <footer class="bg-gray-800 text-gray-400 mt-16">
+        <div class="text-center py-6 text-sm border-t border-gray-700">
+            &copy; 2025 Lost & Found
+        </div>
+    </footer>
+
+    <!-- MY ITEMS MODAL SCRIPT -->
+    <script>
+    function showMyItems() {
+        fetch('/api/my-items')
+            .then(res => res.json())
+            .then(items => {
+                let html = `
+                <div id="myItemsModal"
+                     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                     onclick="closeMyItems(event)">
+                 
+                    <div class="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto relative"
+                         onclick="event.stopPropagation()">
+
+                        <!-- CLOSE BUTTON -->
+                        <button onclick="closeMyItems()"
+                            class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold">
+                            &times;
+                        </button>
+
+                        <h2 class="text-2xl font-bold mb-4">My Reported Items</h2>
+                `;
+
+                if (items.length === 0) {
+                    html += `<p class="text-gray-600">You haven't reported any items yet.</p>`;
+                } else {
+                    items.forEach(item => {
+                        html += `
+                            <div class="border rounded-lg p-4 mb-4">
+                                <h3 class="font-bold text-lg">${item.name}</h3>
+                                <p><strong>Type:</strong> ${item.type}</p>
+                                <p><strong>Status:</strong> ${item.status}</p>
+                                <p><strong>Location:</strong> ${item.location}</p>
+                                <p><strong>Date:</strong> ${item.date}</p>
+                            </div>
+                        `;
+                    });
+                }
+
+            html += `
+                    </div>
+                </div>`;
+
+                document.body.insertAdjacentHTML('beforeend', html);
+            });
+    }
+
+    function closeMyItems() {
+        const modal = document.getElementById('myItemsModal');
+        if (modal) modal.remove();
+    }
+    </script>
+    
+</body>
+</html>
+

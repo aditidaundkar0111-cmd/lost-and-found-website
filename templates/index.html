@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Lost & Found{% endblock %}
+
+{% block content %}
+<section class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-20 text-center">
+    <div class="max-w-6xl mx-auto px-4">
+        <h1 class="text-5xl md:text-6xl font-bold mb-4">Lost Something? Found Something?</h1>
+        <p class="text-xl md:text-2xl mb-8 opacity-90">We help reunite lost items with their owners using AI-powered matching</p>
+        {% if not session.user_email %}
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="{{ url_for('register') }}" class="bg-white text-indigo-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition transform hover:-translate-y-1">Register Now</a>
+                <a href="{{ url_for('browse') }}" class="border-2 border-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-indigo-600 transition transform hover:-translate-y-1">Browse Items</a>
+            </div>
+        {% else %}
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <a href="{{ url_for('report') }}" class="bg-white text-indigo-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition transform hover:-translate-y-1">Report an Item</a>
+                <a href="{{ url_for('browse') }}" class="border-2 border-white px-8 py-3 rounded-lg font-bold hover:bg-white hover:text-indigo-600 transition transform hover:-translate-y-1">Browse Items</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+
+<section class="py-16">
+    <div class="max-w-6xl mx-auto px-4">
+        <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">How It Works</h2>
+        {% if recent_items %}
+        <section class="bg-gray-50 py-16">
+            <div class="max-w-6xl mx-auto px-4">
+                <h2 class="text-3xl font-bold text-center mb-10 text-gray-800">Recently Reported Items</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    {% for item in recent_items %}
+                        <div class="bg-white rounded-lg shadow p-5">
+                            {% if item.image %}
+                                <img src="{{ url_for('static', filename='uploads/' + item.image) }}" class="h-40 w-full object-cover rounded mb-3">
+                            {% else %}
+                                <div class="h-40 bg-indigo-100 flex items-center justify-center rounded mb-3 text-3xl">📦</div>
+                            {% endif %}
+                            <h3 class="font-bold text-lg">{{ item.name }}</h3>
+                            <p class="text-gray-600 text-sm">{{ item.category }} • {{ item.location }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition transform hover:-translate-y-2">
+                <div class="text-5xl mb-4">📝</div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Report</h3>
+                <p class="text-gray-600">Report a lost or found item with details. Items go through admin verification for authenticity.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition transform hover:-translate-y-2">
+                <div class="text-5xl mb-4">🤖</div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">AI Matching</h3>
+                <p class="text-gray-600">Our intelligent system analyzes item details and automatically finds potential matches.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition transform hover:-translate-y-2">
+                <div class="text-5xl mb-4">📧</div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Get Notified</h3>
+                <p class="text-gray-600">Receive email notifications when a match is found for your items.</p>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition transform hover:-translate-y-2">
+                <div class="text-5xl mb-4">✅</div>
+                <h3 class="text-xl font-bold text-gray-800 mb-3">Verified & Safe</h3>
+                <p class="text-gray-600">All items are verified by our admin team to ensure reliability.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Items - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6 py-10">
+
+    <!-- HEADER -->
+    <div class="text-center mb-10">
+        <h1 class="text-3xl font-bold text-indigo-600 flex justify-center items-center gap-2">
+            🔍 Browse Verified Items
+        </h1>
+        <p class="text-gray-500 mt-2">
+            View verified lost and found items reported on campus.
+        </p>
+    </div>
+
+    <!-- SEARCH & FILTER -->
+    <div class="flex flex-col md:flex-row gap-4 justify-center mb-12 max-w-4xl mx-auto">
+        <input id="searchInput" type="text" placeholder="Search items..."
+            class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
+
+        <select id="typeFilter"
+            class="border border-gray-300 rounded-lg px-4 py-2">
+            <option value="all">All</option>
+            <option value="lost">Lost</option>
+            <option value="found">Found</option>
+        </select>
+    </div>
+
+    {% if items %}
+    <!-- ITEMS GRID -->
+    <div id="itemsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+        {% for item in items %}
+        <div class="item-card bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden"
+             data-name="{{ item.name | lower }}"
+             data-type="{{ item.type }}">
+
+            {% if item.image %}
+            <img src="{{ url_for('static', filename='uploads/' + item.image) }}"
+                 class="h-40 w-full object-cover">
+            {% else %}
+            <div class="h-40 bg-indigo-500 flex items-center justify-center text-4xl text-white">
+                📦
+            </div>
+            {% endif %}
+
+            <div class="p-5">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
+                        {{ item.category }}
+                    </span>
+
+                    <span class="text-xs px-3 py-1 rounded-full
+                        {% if item.type == 'lost' %}
+                            bg-red-100 text-red-600
+                        {% else %}
+                            bg-green-100 text-green-600
+                        {% endif %}">
+                        {{ item.type | capitalize }}
+                    </span>
+                </div>
+
+                <h3 class="font-bold text-lg mt-3">{{ item.name }}</h3>
+
+                <p class="text-sm text-gray-500 mt-2">
+                    📍 {{ item.location }}
+                </p>
+
+                <button onclick="viewDetails('{{ item.id }}')"
+                    class="mt-4 w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">
+                    View Details
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- NO RESULTS -->
+    <div id="noResults" class="hidden text-center text-gray-500 mt-20">
+        <p class="text-lg font-semibold">No results found</p>
+        <p class="text-sm mt-2">Try a different search term.</p>
+    </div>
+
+    {% else %}
+    <div class="text-center py-24 text-gray-500">
+        <p class="text-lg">No verified items available.</p>
+        <p class="text-sm mt-2">Please check back later.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- DETAILS MODAL -->
+<div id="detailModal"
+     class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+    <div class="bg-white rounded-lg max-w-md w-full p-6 relative">
+
+        <!-- CLOSE BUTTON -->
+        <button onclick="closeModal()"
+            class="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl">
+            &times;
+        </button>
+
+        <div class="mb-4">
+            <h2 id="detailName" class="text-xl font-bold"></h2>
+            <span id="detailType" class="inline-block mt-2 text-xs px-3 py-1 rounded-full"></span>
+        </div>
+
+        <p id="detailDesc" class="text-gray-600 mb-4"></p>
+
+        <p class="text-sm text-gray-500">
+            <strong>Category:</strong> <span id="detailCategory"></span>
+        </p>
+        <p class="text-sm text-gray-500">
+            <strong>Location:</strong> <span id="detailLocation"></span>
+        </p>
+    </div>
+</div>
+
+<script>
+const itemsData = {{ items | tojson }} || [];
+
+/* VIEW DETAILS */
+function viewDetails(itemId) {
+    const item = itemsData.find(i => String(i.id) === String(itemId));
+    if (!item) {
+        console.error('Item not found:', itemId);
+        return;
+    }
+
+    const nameEl = document.getElementById('detailName');
+    const descEl = document.getElementById('detailDesc');
+    const catEl = document.getElementById('detailCategory');
+    const locEl = document.getElementById('detailLocation');
+    const badge = document.getElementById('detailType');
+    const modal = document.getElementById('detailModal');
+
+    if (nameEl) nameEl.textContent = item.name || '';
+    if (descEl) descEl.textContent = item.description || '';
+    if (catEl) catEl.textContent = item.category || '';
+    if (locEl) locEl.textContent = item.location || '';
+
+    if (badge) {
+        const t = (item.type || '').toLowerCase();
+        badge.textContent = (t || '').toUpperCase();
+        badge.className = t === 'lost'
+            ? 'inline-block mt-2 text-xs px-3 py-1 rounded-full bg-red-100 text-red-600'
+            : 'inline-block mt-2 text-xs px-3 py-1 rounded-full bg-green-100 text-green-600';
+    }
+
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('detailModal');
+    if (!modal) return;
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+/* SEARCH & FILTER */
+const searchInputEl = document.getElementById('searchInput');
+const typeFilterEl = document.getElementById('typeFilter');
+if (searchInputEl) searchInputEl.addEventListener('input', filterItems);
+if (typeFilterEl) typeFilterEl.addEventListener('change', filterItems);
+
+function filterItems() {
+    const query = (searchInputEl && searchInputEl.value ? searchInputEl.value.toLowerCase() : '');
+    const type = (typeFilterEl && typeFilterEl.value) ? typeFilterEl.value : 'all';
+
+    let visible = 0;
+
+    document.querySelectorAll('.item-card').forEach(card => {
+        const name = (card.dataset.name || '');
+        const itemType = (card.dataset.type || '');
+
+        const matchQuery = name.includes(query);
+        const matchType = type === 'all' || itemType === type;
+
+        if (matchQuery && matchType) {
+            card.style.display = '';
+            visible++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    const noResultsEl = document.getElementById('noResults');
+    if (noResultsEl) {
+        noResultsEl.classList.toggle('hidden', visible !== 0);
+    }
+}
+</script>
+{% endblock %}
+

@@ -39,10 +39,7 @@ lost_found_website/
 │   ├── admin_dashboard.html  # Admin dashboard
 │   └── admin_items.html      # Admin item management
 ├── static/
-│   ├── css/
-│   │   └── style.css    # Complete styling
-│   └── js/
-│       └── (scripts in HTML files)
+│   |--- uploads
 └── data/               # JSON database files
     ├── users.json
     ├── items.json
@@ -182,7 +179,6 @@ When a match is found, users receive an email with:
 
 ### Other
 - `POST /contact` - Contact form
-- `POST /api/chatbot` - Chatbot response
 - `POST /api/item/<id>/notify` - Send notification
 
 ## Customization
@@ -245,7 +241,6 @@ This project is open source and available for educational purposes.
 For issues or questions:
 - Create an issue on GitHub
 - Contact: support@lostandfound.com
-- Use the in-app chat assistant
 
 ## Contributing
 

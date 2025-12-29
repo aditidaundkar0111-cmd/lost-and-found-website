@@ -1,10 +1,7 @@
 {% extends 'base.html' %}
-
 {% block title %}Admin - Manage Items{% endblock %}
-
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 py-12">
-
     <h1 class="text-3xl font-bold text-indigo-600 mb-6 text-center">
         Manage Reported Items
     </h1>
@@ -38,11 +35,9 @@
                     <th class="p-3">Actions</th>
                 </tr>
             </thead>
-
             <tbody id="itemsTable">
                 {% for item in items %}
                 <tr data-status="{{ item.status }}" class="border-t">
-
                     <td class="p-3">
                         {% if item.image %}
                             <img src="{{ url_for('static', filename='uploads/' + item.image) }}"
@@ -51,20 +46,16 @@
                             <span class="text-2xl">📦</span>
                         {% endif %}
                     </td>
-
                     <td class="p-3 font-semibold">{{ item.name }}</td>
                     <td class="p-3">{{ item.category }}</td>
                     <td class="p-3">{{ item.location }}</td>
-
                     <td class="p-3 capitalize">{{ item.status }}</td>
-
                     <td class="p-3 space-x-2">
-                        {% if item.status == 'pending' %}
+                        {% if not item.verified %}
                         <button onclick="verifyItem('{{ item.id }}')"
                             class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
                             Verify
                         </button>
-
                         <button onclick="rejectItem('{{ item.id }}')"
                             class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
                             Reject
@@ -73,7 +64,6 @@
                         <span class="text-gray-500 text-sm">No actions</span>
                         {% endif %}
                     </td>
-
                 </tr>
                 {% endfor %}
             </tbody>
@@ -97,7 +87,10 @@ function verifyItem(itemId) {
         .then(res => res.json())
         .then(data => {
             showMessage(data.message, data.success);
-            if (data.success) setTimeout(() => location.reload(), 800);
+            if (data.success) {
+                showMessage(data.message, true);
+                location.reload();
+            }
         });
 }
 
@@ -107,7 +100,10 @@ function rejectItem(itemId) {
         .then(res => res.json())
         .then(data => {
             showMessage(data.message, data.success);
-            if (data.success) setTimeout(() => location.reload(), 800);
+            if (data.success) {
+                showMessage(data.message, true);
+                location.reload();
+            }
         });
 }
 
@@ -122,4 +118,3 @@ function showMessage(text, success) {
 }
 </script>
 {% endblock %}
-

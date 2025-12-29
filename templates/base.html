@@ -18,7 +18,6 @@
 </head>
 
 <body class="bg-white">
-
     <!-- NAVBAR -->
     <nav class="sticky top-0 z-50 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg">
         <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
@@ -146,21 +145,16 @@
                         `;
                     });
                 }
-
             html += `
                     </div>
                 </div>`;
-
                 document.body.insertAdjacentHTML('beforeend', html);
             });
     }
-
     function closeMyItems() {
         const modal = document.getElementById('myItemsModal');
         if (modal) modal.remove();
     }
-    </script>
-    
+    </script>    
 </body>
 </html>
-

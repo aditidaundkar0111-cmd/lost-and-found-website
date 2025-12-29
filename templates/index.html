@@ -1,7 +1,5 @@
 {% extends 'base.html' %}
-
 {% block title %}Home - Lost & Found{% endblock %}
-
 {% block content %}
 <section class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-20 text-center">
     <div class="max-w-6xl mx-auto px-4">
@@ -28,7 +26,6 @@
         <section class="bg-gray-50 py-16">
             <div class="max-w-6xl mx-auto px-4">
                 <h2 class="text-3xl font-bold text-center mb-10 text-gray-800">Recently Reported Items</h2>
-
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     {% for item in recent_items %}
                         <div class="bg-white rounded-lg shadow p-5">
@@ -70,5 +67,4 @@
         </div>
     </div>
 </section>
-
 {% endblock %}

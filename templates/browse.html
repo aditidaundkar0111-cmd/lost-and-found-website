@@ -7,9 +7,7 @@
 
     <!-- HEADER -->
     <div class="text-center mb-10">
-        <h1 class="text-3xl font-bold text-indigo-600 flex justify-center items-center gap-2">
-            🔍 Browse Verified Items
-        </h1>
+        <h1 class="text-3xl font-bold text-indigo-600 flex justify-center items-center gap-2">🔍 Browse Verified Items</h1>
         <p class="text-gray-500 mt-2">
             View verified lost and found items reported on campus.
         </p>
@@ -19,7 +17,6 @@
     <div class="flex flex-col md:flex-row gap-4 justify-center mb-12 max-w-4xl mx-auto">
         <input id="searchInput" type="text" placeholder="Search items..."
             class="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-500">
-
         <select id="typeFilter"
             class="border border-gray-300 rounded-lg px-4 py-2">
             <option value="all">All</option>
@@ -37,8 +34,11 @@
              data-type="{{ item.type }}">
 
             {% if item.image %}
-            <img src="{{ url_for('static', filename='uploads/' + item.image) }}"
-                 class="h-40 w-full object-cover">
+            <div class="w-full h-40 bg-gray-100 flex items-center justify-center cursor-pointer"
+                onclick="openImageModal('{{ url_for('static', filename='uploads/' + item.image) }}')">
+                <img src="{{ url_for('static', filename='uploads/' + item.image) }}"
+                    class="max-h-full max-w-full object-contain">
+            </div>
             {% else %}
             <div class="h-40 bg-indigo-500 flex items-center justify-center text-4xl text-white">
                 📦
@@ -50,7 +50,6 @@
                     <span class="text-xs bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">
                         {{ item.category }}
                     </span>
-
                     <span class="text-xs px-3 py-1 rounded-full
                         {% if item.type == 'lost' %}
                             bg-red-100 text-red-600
@@ -62,7 +61,6 @@
                 </div>
 
                 <h3 class="font-bold text-lg mt-3">{{ item.name }}</h3>
-
                 <p class="text-sm text-gray-500 mt-2">
                     📍 {{ item.location }}
                 </p>
@@ -107,7 +105,6 @@
         </div>
 
         <p id="detailDesc" class="text-gray-600 mb-4"></p>
-
         <p class="text-sm text-gray-500">
             <strong>Category:</strong> <span id="detailCategory"></span>
         </p>
@@ -127,7 +124,6 @@ function viewDetails(itemId) {
         console.error('Item not found:', itemId);
         return;
     }
-
     const nameEl = document.getElementById('detailName');
     const descEl = document.getElementById('detailDesc');
     const catEl = document.getElementById('detailCategory');
@@ -139,7 +135,6 @@ function viewDetails(itemId) {
     if (descEl) descEl.textContent = item.description || '';
     if (catEl) catEl.textContent = item.category || '';
     if (locEl) locEl.textContent = item.location || '';
-
     if (badge) {
         const t = (item.type || '').toLowerCase();
         badge.textContent = (t || '').toUpperCase();
@@ -147,13 +142,11 @@ function viewDetails(itemId) {
             ? 'inline-block mt-2 text-xs px-3 py-1 rounded-full bg-red-100 text-red-600'
             : 'inline-block mt-2 text-xs px-3 py-1 rounded-full bg-green-100 text-green-600';
     }
-
     if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
 }
-
 function closeModal() {
     const modal = document.getElementById('detailModal');
     if (!modal) return;
@@ -170,13 +163,10 @@ if (typeFilterEl) typeFilterEl.addEventListener('change', filterItems);
 function filterItems() {
     const query = (searchInputEl && searchInputEl.value ? searchInputEl.value.toLowerCase() : '');
     const type = (typeFilterEl && typeFilterEl.value) ? typeFilterEl.value : 'all';
-
     let visible = 0;
-
     document.querySelectorAll('.item-card').forEach(card => {
         const name = (card.dataset.name || '');
         const itemType = (card.dataset.type || '');
-
         const matchQuery = name.includes(query);
         const matchType = type === 'all' || itemType === type;
 
@@ -187,12 +177,24 @@ function filterItems() {
             card.style.display = 'none';
         }
     });
-
     const noResultsEl = document.getElementById('noResults');
     if (noResultsEl) {
         noResultsEl.classList.toggle('hidden', visible !== 0);
     }
 }
 </script>
+<div id="imageModal"
+     class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center z-50">
+    
+    <img id="modalImg" class="max-h-[90%] max-w-[90%] rounded shadow-lg">
+</div>
+<script>
+function openImageModal(src) {
+    document.getElementById('modalImg').src = src;
+    document.getElementById('imageModal').classList.remove('hidden');
+}
+document.getElementById('imageModal').onclick = function () {
+    this.classList.add('hidden');
+}
+</script>
 {% endblock %}
-

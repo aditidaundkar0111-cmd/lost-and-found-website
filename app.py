@@ -13,7 +13,10 @@ from difflib import SequenceMatcher
 import re
 from PIL import Image
 from dotenv import load_dotenv
-load_dotenv()
+from pathlib import Path
+
+env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(dotenv_path=env_path, override=True)
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
@@ -30,8 +33,6 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 # Email configuration
 EMAIL_ADDRESS = os.getenv("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
-print("Email:", EMAIL_ADDRESS)
-print("Secret key loaded:", bool(app.secret_key))
 
 # File paths
 USERS_FILE = 'data/users.json'
@@ -109,14 +110,19 @@ def send_email(to_email, subject, message):
         msg = MIMEMultipart()
         msg['From'] = EMAIL_ADDRESS
         msg['To'] = to_email
-        msg['Subject'] = subject    
-        msg.attach(MIMEText(message, 'html')) 
-        server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+        msg['Subject'] = subject
+        msg.attach(MIMEText(message, 'html'))
+
+        server = smtplib.SMTP_SSL('smtp.gmail.com', 465, timeout=10)
         server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         server.send_message(msg)
         server.quit()
+
+        print("✅ Email sent successfully")
         return True
-    except:
+
+    except Exception as e:
+        print("❌ Email sending failed:", e)
         return False
 
 def calculate_similarity(str1, str2):
@@ -138,9 +144,9 @@ def find_matches(item_id, item_type):
         
         # Calculate similarity scores
         name_similarity = calculate_similarity(current_item.get('name', ''), item.get('name', ''))
-        category_match = current_item.get('category') == item.get('category')
+        category_match = 1.0 if current_item.get('category') == item.get('category') else 0.0
         location_similarity = calculate_similarity(current_item.get('location', ''), item.get('location', ''))
-        color_match = current_item.get('color', '').lower() == item.get('color', '').lower()
+        color_match = 1.0 if current_item.get('color', '').lower() == item.get('color', '').lower() else 0.0
         
         # Weighted score
         score = (name_similarity * 0.4) + (category_match * 0.3) + (location_similarity * 0.2) + (color_match * 0.1)
@@ -246,8 +252,7 @@ def browse():
 @login_required
 def report():
     if request.method == 'POST':
-        data = request.form
-        
+        data = request.form   
         required_fields = ['name', 'category', 'type', 'location', 'description']
         if not all(data.get(field) for field in required_fields):
             return jsonify({'success': False, 'message': 'All fields required'}), 400
@@ -272,10 +277,8 @@ def report():
             'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'verified': False,
             'status': 'pending'
-        }
-        
-        save_json(ITEMS_FILE, items)
-        
+        } 
+        save_json(ITEMS_FILE, items) 
         return jsonify({'success': True, 'message': 'Item reported successfully! Awaiting admin verification.', 'item_id': item_id}), 201
     return render_template('report.html')
 
@@ -313,8 +316,7 @@ def search_items():
         if item_type and item.get('type') != item_type:
             continue   
         if query and query not in item.get('name', '').lower() and query not in item.get('description', '').lower():
-            continue
-        
+            continue 
         results.append({**item, 'id': id})
     return jsonify(results)
 
@@ -342,40 +344,60 @@ def admin_items():
 @admin_required
 def verify_item(item_id):
     items = load_json(ITEMS_FILE)
-    
     if item_id not in items:
         return jsonify({'error': 'Item not found'}), 404
-    
     items[item_id]['verified'] = True
     items[item_id]['status'] = 'active'
+
+    item_type = items[item_id]['type']
+    matches = find_matches(item_id, item_type)
+
+    if matches:
+        best_match = matches[0]
+        matched_id = best_match['item_id']
+        items[item_id]['status'] = 'matched'
+        items[matched_id]['status'] = 'matched'
+
+        send_email(
+            items[item_id]['reported_by'],
+            "🎉 Match Found!",
+            f"""
+            <h2>Great News!</h2>
+            <p>Your item <b>{items[item_id]['name']}</b> has been matched.</p>
+            <p>Please log in to view details.</p>
+            """
+        )
+
+        send_email(
+            items[matched_id]['reported_by'],
+            "🎉 Match Found!",
+            f"""
+            <h2>Great News!</h2>
+            <p>Your item <b>{items[matched_id]['name']}</b> has been matched.</p>
+            <p>Please log in to view details.</p>
+            """
+        )
     save_json(ITEMS_FILE, items)
-    
     return jsonify({'success': True, 'message': 'Item verified'}), 200
 
 @app.route('/api/admin/reject/<item_id>', methods=['POST'])
 @admin_required
 def reject_item(item_id):
     items = load_json(ITEMS_FILE)
-    
     if item_id not in items:
         return jsonify({'error': 'Item not found'}), 404
-    
     del items[item_id]
     save_json(ITEMS_FILE, items)
-    
     return jsonify({'success': True, 'message': 'Item rejected'}), 200
 
 @app.route('/api/item/<item_id>/notify', methods=['POST'])
 @login_required
 def notify_match(item_id):
     items = load_json(ITEMS_FILE)
-    
     if item_id not in items:
-        return jsonify({'error': 'Item not found'}), 404
-    
+        return jsonify({'error': 'Item not found'}), 404   
     item = items[item_id]
     recipient_email = item.get('reported_by')
-    
     subject = f"Potential Match Found for Your {item.get('type').title()} Item!"
     message = f"""
     <h2>Match Alert</h2>
@@ -390,8 +412,7 @@ def notify_match(item_id):
     </ul>
     <p>Please log in to the website to view details and contact the person who reported the {item.get('type')} item.</p>
     <p>Best regards,<br>Lost & Found Team</p>
-    """
-    
+    """   
     if send_email(recipient_email, subject, message):
         return jsonify({'success': True, 'message': 'Notification sent!'}), 200
     else:
@@ -400,16 +421,13 @@ def notify_match(item_id):
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():
     if request.method == 'POST':
-        data = request.get_json()
-        
+        data = request.get_json()       
         name = data.get('name', '').strip()
         email = data.get('email', '').strip().lower()
         subject = data.get('subject', '').strip()
-        message = data.get('message', '').strip()
-        
+        message = data.get('message', '').strip()       
         if not all([name, email, subject, message]):
-            return jsonify({'success': False, 'message': 'All fields required'}), 400
-        
+            return jsonify({'success': False, 'message': 'All fields required'}), 400        
         # Store contact message
         reports = load_json(REPORTS_FILE)
         reports[str(uuid.uuid4())] = {
@@ -429,10 +447,8 @@ def contact():
         <p>We will review your message and get back to you shortly.</p>
         <p>Best regards,<br>Lost & Found Team</p>
         """
-        send_email(email, "We Received Your Message", response_message)
-        
-        return jsonify({'success': True, 'message': 'Message sent! We will contact you soon.'}), 200
-    
+        send_email(email, "We Received Your Message", response_message)        
+        return jsonify({'success': True, 'message': 'Message sent! We will contact you soon.'}), 200   
     return render_template('contact.html')
 
 if __name__ == '__main__':

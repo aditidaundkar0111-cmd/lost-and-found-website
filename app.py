@@ -353,31 +353,74 @@ def verify_item(item_id):
     matches = find_matches(item_id, item_type)
 
     if matches:
-        best_match = matches[0]
-        matched_id = best_match['item_id']
-        items[item_id]['status'] = 'matched'
-        items[matched_id]['status'] = 'matched'
+       best_match = matches[0]
+       matched_id = best_match['item_id']
 
-        send_email(
-            items[item_id]['reported_by'],
-            "🎉 Match Found!",
-            f"""
-            <h2>Great News!</h2>
-            <p>Your item <b>{items[item_id]['name']}</b> has been matched.</p>
-            <p>Please log in to view details.</p>
-            """
-        )
+       # Mark both items as matched
+       items[item_id]['status'] = 'matched'
+       items[matched_id]['status'] = 'matched'
 
-        send_email(
-            items[matched_id]['reported_by'],
-            "🎉 Match Found!",
-            f"""
-            <h2>Great News!</h2>
-            <p>Your item <b>{items[matched_id]['name']}</b> has been matched.</p>
-            <p>Please log in to view details.</p>
-            """
-        )
+       # Email to LOST item user
+       send_email(
+           items[item_id]['reported_by'],
+           "🎉 Match Found!",
+           f"""
+           <h2>🎉 Great News!</h2>
+
+           <p>Your item <b>{items[item_id]['name']}</b> has been successfully matched.</p>
+
+           <p>
+           For safety and verification, user contact details are not shared directly.
+           </p>
+
+           <p>
+           👉 Please <b>log in to the Lost & Found website</b> and contact the
+           <b>Lost & Found Admin</b> using the Contact page to collect your item.
+           </p>
+
+           <p>
+           The admin will verify the details and arrange a safe, supervised handover.
+           </p>
+
+           <p>
+           Regards,<br>
+           <b>Lost & Found Team</b>
+           </p>
+           """
+       )
+
+       # Email to FOUND item user
+       send_email(
+           items[matched_id]['reported_by'],
+           "🎉 Match Found!",
+           f"""
+           <h2>🎉 Great News!</h2>
+
+           <p>Your reported item <b>{items[matched_id]['name']}</b> has been successfully matched.</p>
+
+           <p>
+           For safety and verification, user contact details are not shared directly.
+           </p>
+
+           <p>
+           👉 Please <b>log in to the Lost & Found website</b> and contact the
+           <b>Lost & Found Admin</b> using the Contact page to hand over the item.
+           </p>
+
+           <p>
+           The admin will verify the details and arrange a safe, supervised handover.
+           </p>
+
+           <p>
+           Regards,<br>
+           <b>Lost & Found Team</b>
+           </p>
+           """
+       )
+
+    # Save changes
     save_json(ITEMS_FILE, items)
+
     return jsonify({'success': True, 'message': 'Item verified'}), 200
 
 @app.route('/api/admin/reject/<item_id>', methods=['POST'])

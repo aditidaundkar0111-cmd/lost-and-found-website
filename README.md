@@ -1,15 +1,16 @@
-🔍 Lost & Found Website
+# 🔍 Lost & Found Website
 
 A secure, admin-verified **Lost & Found web application** with AI-assisted item matching and email notifications.
 
-This project is designed for **academic use** and demonstrates a complete real-world workflow with admin control to prevent false claims.
+This project is developed as a **college academic project** and demonstrates a complete real-world workflow with admin control to prevent false claims.
 
 ---
 
 ## 📌 Project Overview
 
-The Lost & Found Website allows users to report lost or found items, while an admin verifies reports and confirms matches using an AI-assisted matching system.  
-Items are never matched automatically — **admin approval is mandatory** for safety and authenticity.
+The Lost & Found Website allows users to report lost or found items, while an admin verifies reports and confirms matches using an AI-assisted matching system.
+
+📌 Items are **never matched automatically** — admin approval is mandatory for safety and authenticity.
 
 ---
 
@@ -43,7 +44,7 @@ Copy code
 - **active** → Admin verified (visible to all users)
 - **matched** → Admin confirmed match (emails sent)
 
-📌 AI suggests matches, **admin makes the final decision**.
+📌 AI assists the admin, but **final decision is always manual**.
 
 ---
 
@@ -52,7 +53,7 @@ Copy code
 - **Frontend:** HTML5, Tailwind CSS
 - **Backend:** Python (Flask)
 - **Database:** JSON files
-- **AI Matching:** String similarity algorithm
+- **AI Matching:** String similarity algorithm (SequenceMatcher)
 - **Email Service:** Gmail SMTP
 - **Authentication:** Session-based login
 
@@ -81,6 +82,7 @@ lost_found_website/
 ├── reports.json
 └── admins.json
 
+yaml
 Copy code
 
 ---
@@ -88,21 +90,25 @@ Copy code
 ## 🚀 Installation & Setup
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.8 or above
 - pip
 
+---
+
 ### Install Dependencies
+
 ```bash
 pip install -r requirements.txt
 Configure Environment Variables
-Create a .env file (do NOT upload to GitHub):
+Create a .env file in the project root
+(Do NOT upload this file to GitHub):
 
 env
 Copy code
 SECRET_KEY=your_secret_key
 EMAIL_ADDRESS=yourgmail@gmail.com
 EMAIL_PASSWORD=your_gmail_app_password
-📌 Gmail App Password is required (2-Step Verification enabled).
+📌 Note: Gmail App Password is required (2-Step Verification must be enabled).
 
 Run the Application
 bash
@@ -161,9 +167,9 @@ Only matches with more than 50% similarity score are suggested.
 📧 Email Notifications
 Emails are sent only after admin confirms a match:
 
-❌ No email on report
+❌ No email on item report
 
-❌ No email on verification
+❌ No email on admin verification
 
 ✅ Email only after confirmation
 
@@ -231,9 +237,9 @@ JSON database used for simplicity
 🚧 Known Limitations
 SMTP email is synchronous (slight delay)
 
-JSON database (not production-ready)
+JSON database is not production-ready
 
-AI is rule-based (not ML)
+AI is rule-based, not machine learning
 
 🔮 Future Enhancements
 Asynchronous email queue

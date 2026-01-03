@@ -88,33 +88,38 @@ lost_found_website/
 - Python 3.8 or above
 - pip
 
-### Install Dependencies
-pip install -r requirements.txt
+---
 
-csharp
-Copy code
+### Install Dependencies
+
+Run the following command:
+
+`pip install -r requirements.txt`
+
+---
 
 ### Configure Environment Variables
 
 Create a `.env` file in the project root  
-(Do NOT upload this file to GitHub)
+(Do **NOT** upload this file to GitHub)
 
-SECRET_KEY=your_secret_key
-EMAIL_ADDRESS=yourgmail@gmail.com
-EMAIL_PASSWORD=your_gmail_app_password
+Add the following variables:
 
-vbnet
-Copy code
+- SECRET_KEY=your_secret_key
+- EMAIL_ADDRESS=yourgmail@gmail.com
+- EMAIL_PASSWORD=your_gmail_app_password
 
-Note: Gmail App Password is required (2-Step Verification must be enabled).
+**Note:** Gmail App Password is required (2-Step Verification must be enabled).
+
+---
 
 ### Run the Application
-python app.py
 
-yaml
-Copy code
+Start the Flask server using:
 
-Access the website at:
+`python app.py`
+
+Access the website at:  
 http://localhost:5000
 
 ---
@@ -124,7 +129,7 @@ http://localhost:5000
 Email: admin@lostandfound.com  
 Password: admin123  
 
-This is a system login ID, not an actual email inbox.
+(This is a system login ID, not an actual email inbox.)
 
 ---
 

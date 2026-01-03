@@ -1,15 +1,11 @@
-📦 Lost & Found Website
-
+**📦 Lost & Found Website**
 A secure, admin-verified lost and found system with AI-assisted matching
 
-📌 Project Overview
-
+**📌 Project Overview**
 This project is a college-level Lost & Found web application designed to help users report, verify, and recover lost items safely.
 The system uses admin verification and AI-assisted matching to prevent false claims and ensure secure item handover.
 
-
-✨ Key Features
-
+**✨ Key Features**
 👤 User Features
 🔐 User Registration & Login
 📝 Report Lost or Found Items
@@ -19,8 +15,7 @@ The system uses admin verification and AI-assisted matching to prevent false cla
 📞 Contact support via contact form
 
 
-🛡️ Admin Features
-
+**🛡️ Admin Features**
 ✅ Verify or Reject reported items
 🔍 View AI-suggested item matches
 🤝 Manually confirm correct matches
@@ -28,8 +23,7 @@ The system uses admin verification and AI-assisted matching to prevent false cla
 📊 Dashboard with item statistics
 
 
-🧠 Core System Logic (Very Important)
-
+**🧠 Core System Logic (Very Important)**
 Item Lifecycle
 pending → active → matched
 
@@ -40,9 +34,7 @@ matched → Admin confirmed match (emails sent)
 📌 There is NO automatic matching or auto-emailing
 📌 Admin always takes the final decision
 
-
-🛠️ Technology Stack
-
+**🛠️ Technology Stack**
 Frontend: HTML5, Tailwind CSS
 Backend: Python (Flask)
 Database: JSON files
@@ -50,8 +42,7 @@ AI Matching: String similarity (SequenceMatcher)
 Email: Gmail SMTP
 Authentication: Session-based login
 
-
-📂 Project Structure
+**📂 Project Structure**
 lost_found_website/
 ├── app.py
 ├── requirements.txt
@@ -73,9 +64,7 @@ lost_found_website/
     ├── reports.json
     └── admins.json
 
-
-🚀 Installation & Setup
-
+**🚀 Installation & Setup**
 Prerequisites
 Python 3.8+
 pip
@@ -94,25 +83,21 @@ python app.py
 Access at:
 👉 http://localhost:5000
 
-
-🔑 Default Admin Account
+**🔑 Default Admin Account**
 Field	Value
 Email	admin@lostandfound.com
 Password	admin123
 📌 This is a system login ID, not an actual mailbox.
 
-🔄 How the System Works
-
-👤 User Flow
+**🔄 How the System Works**
+**👤 User Flow**
 Register / Login
 Report Lost or Found Item
 Item waits for admin verification
 Browse verified items
 Receive email after admin confirms match
 
-
-🛡️ Admin Flow
-
+**🛡️ Admin Flow**
 Login as Admin
 Verify or Reject items
 View AI-suggested matches
@@ -120,9 +105,7 @@ Manually confirm correct match
 Emails sent to both users
 Item marked as matched
 
-
-🤖 AI Matching System
-
+**🤖 AI Matching System**
 AI suggests matches using:
 Name similarity (40%)
 Category match (30%)
@@ -131,17 +114,14 @@ Color match (10%)
 Only matches with >50% score are suggested.
 📌 AI assists admin, it does not decide automatically.
 
-
-📧 Email Notifications
-
+**📧 Email Notifications**
 Emails are sent only when admin confirms a match.
 No email on report
 No email on verification
 Email only after confirmation
 This ensures no false notifications.
 
-
-🗃️ Database Format
+**🗃️ Database Format**
 items.json
 {
   "item_id": {
@@ -157,9 +137,8 @@ items.json
   }
 }
 
-🌐 API Endpoints
-
-User
+**🌐 API Endpoints**
+**User**
 POST /register
 POST /login
 GET /logout
@@ -168,7 +147,7 @@ POST /report
 GET /api/my-items
 GET /api/search
 
-Admin
+**Admin**
 GET /admin/dashboard
 GET /admin/items
 POST /api/admin/verify/<item_id>
@@ -176,28 +155,22 @@ POST /api/admin/reject/<item_id>
 GET /api/admin/matches/<item_id>
 POST /api/admin/confirm-match/<item_id>/<match_id>
 
-Contact
+**Contact**
 POST /contact
 
-
-🎓 Academic Justification (Viva Ready)
-
+**🎓 Academic Justification** 
 Admin verification prevents fake claims
 AI reduces manual effort
 Manual confirmation ensures safety
 Email only after verification avoids misuse
 JSON database used for simplicity
 
-
-🚧 Known Limitations
-
+**🚧 Known Limitations**
 SMTP email is synchronous (may be slow)
 JSON database (not for production)
 AI is rule-based, not ML
 
-
-🔮 Future Enhancements
-
+**🔮 Future Enhancements**
 Async email queue
 Database (SQLite / MySQL)
 Image similarity matching

@@ -243,8 +243,8 @@ def logout():
 def browse():
     items = load_json(ITEMS_FILE)
     verified_items = [
-        {**item, 'id': id} for id, item in items.items() 
-        if item.get('verified') and item.get('status') != 'matched'
+       {**item, 'id': id} for id, item in items.items()
+       if item.get('status') == 'active'
     ]
     return render_template('browse.html', items=verified_items)
 
@@ -275,7 +275,6 @@ def report():
             'image': image_filename,
             'reported_by': session['user_email'],
             'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-            'verified': False,
             'status': 'pending'
         } 
         save_json(ITEMS_FILE, items) 
@@ -309,8 +308,8 @@ def search_items():
     items = load_json(ITEMS_FILE)
     results = []
     for id, item in items.items():
-        if not item.get('verified') or item.get('status') == 'matched':
-            continue     
+        if item.get('status') != 'active':
+            continue
         if category and item.get('category') != category:
             continue    
         if item_type and item.get('type') != item_type:
@@ -325,7 +324,7 @@ def search_items():
 def admin_dashboard():
     items = load_json(ITEMS_FILE)
     pending = sum(1 for item in items.values() if item.get('status') == 'pending')
-    verified = sum(1 for item in items.values() if item.get('verified'))
+    verified = sum(1 for item in items.values() if item.get('status') == 'active')
     matched = sum(1 for item in items.values() if item.get('status') == 'matched')
     
     return render_template('admin_dashboard.html', 
@@ -344,84 +343,23 @@ def admin_items():
 @admin_required
 def verify_item(item_id):
     items = load_json(ITEMS_FILE)
+
     if item_id not in items:
         return jsonify({'error': 'Item not found'}), 404
-    items[item_id]['verified'] = True
+
+    # Allow verification only once
+    if items[item_id].get('status') != 'pending':
+        return jsonify({'error': 'Item already verified or processed'}), 400
+
+    # ✅ Admin verification ONLY
     items[item_id]['status'] = 'active'
 
-    item_type = items[item_id]['type']
-    matches = find_matches(item_id, item_type)
-
-    if matches:
-       best_match = matches[0]
-       matched_id = best_match['item_id']
-
-       # Mark both items as matched
-       items[item_id]['status'] = 'matched'
-       items[matched_id]['status'] = 'matched'
-
-       # Email to LOST item user
-       send_email(
-           items[item_id]['reported_by'],
-           "🎉 Match Found!",
-           f"""
-           <h2>🎉 Great News!</h2>
-
-           <p>Your item <b>{items[item_id]['name']}</b> has been successfully matched.</p>
-
-           <p>
-           For safety and verification, user contact details are not shared directly.
-           </p>
-
-           <p>
-           👉 Please <b>log in to the Lost & Found website</b> and contact the
-           <b>Lost & Found Admin</b> using the Contact page to collect your item.
-           </p>
-
-           <p>
-           The admin will verify the details and arrange a safe, supervised handover.
-           </p>
-
-           <p>
-           Regards,<br>
-           <b>Lost & Found Team</b>
-           </p>
-           """
-       )
-
-       # Email to FOUND item user
-       send_email(
-           items[matched_id]['reported_by'],
-           "🎉 Match Found!",
-           f"""
-           <h2>🎉 Great News!</h2>
-
-           <p>Your reported item <b>{items[matched_id]['name']}</b> has been successfully matched.</p>
-
-           <p>
-           For safety and verification, user contact details are not shared directly.
-           </p>
-
-           <p>
-           👉 Please <b>log in to the Lost & Found website</b> and contact the
-           <b>Lost & Found Admin</b> using the Contact page to hand over the item.
-           </p>
-
-           <p>
-           The admin will verify the details and arrange a safe, supervised handover.
-           </p>
-
-           <p>
-           Regards,<br>
-           <b>Lost & Found Team</b>
-           </p>
-           """
-       )
-
-    # Save changes
     save_json(ITEMS_FILE, items)
 
-    return jsonify({'success': True, 'message': 'Item verified'}), 200
+    return jsonify({
+        'success': True,
+        'message': 'Item verified successfully'
+    }), 200
 
 @app.route('/api/admin/reject/<item_id>', methods=['POST'])
 @admin_required
@@ -433,33 +371,59 @@ def reject_item(item_id):
     save_json(ITEMS_FILE, items)
     return jsonify({'success': True, 'message': 'Item rejected'}), 200
 
-@app.route('/api/item/<item_id>/notify', methods=['POST'])
-@login_required
-def notify_match(item_id):
+@app.route('/api/admin/confirm-match/<item_id>/<match_id>', methods=['POST'])
+@admin_required
+def confirm_match(item_id, match_id):
+    items = load_json(ITEMS_FILE)
+
+    if item_id not in items or match_id not in items:
+        return jsonify({'error': 'Item not found'}), 404
+
+    # Mark both items as matched
+    items[item_id]['status'] = 'matched'
+    items[match_id]['status'] = 'matched'
+
+    save_json(ITEMS_FILE, items)
+
+    # 📧 EMAIL TO LOST ITEM USER
+    send_email(
+        items[item_id]['reported_by'],
+        "🎉 Match Found!",
+        f"""
+        <h2>🎉 Match Confirmed</h2>
+        <p>Your item <b>{items[item_id]['name']}</b> has been matched.</p>
+        <p>Please contact the Lost & Found admin for collection.</p>
+        <p><b>Lost & Found Team</b></p>
+        """
+    )
+
+    # 📧 EMAIL TO FOUND ITEM USER
+    send_email(
+        items[match_id]['reported_by'],
+        "🎉 Match Found!",
+        f"""
+        <h2>🎉 Match Confirmed</h2>
+        <p>The item you reported <b>{items[match_id]['name']}</b> has been matched.</p>
+        <p>Please contact the Lost & Found admin for safe handover.</p>
+        <p><b>Lost & Found Team</b></p>
+        """
+    )
+
+    return jsonify({
+        'success': True,
+        'message': 'Match confirmed and emails sent'
+    }), 200
+
+@app.route('/api/admin/matches/<item_id>')
+@admin_required
+def admin_matches(item_id):
     items = load_json(ITEMS_FILE)
     if item_id not in items:
-        return jsonify({'error': 'Item not found'}), 404   
-    item = items[item_id]
-    recipient_email = item.get('reported_by')
-    subject = f"Potential Match Found for Your {item.get('type').title()} Item!"
-    message = f"""
-    <h2>Match Alert</h2>
-    <p>Hi {session.get('user_name')},</p>
-    <p>We found a potential match for your {item.get('type')} item: <strong>{item.get('name')}</strong></p>
-    <p><strong>Details:</strong></p>
-    <ul>
-        <li>Category: {item.get('category')}</li>
-        <li>Location: {item.get('location')}</li>
-        <li>Color: {item.get('color')}</li>
-        <li>Date: {item.get('date')}</li>
-    </ul>
-    <p>Please log in to the website to view details and contact the person who reported the {item.get('type')} item.</p>
-    <p>Best regards,<br>Lost & Found Team</p>
-    """   
-    if send_email(recipient_email, subject, message):
-        return jsonify({'success': True, 'message': 'Notification sent!'}), 200
-    else:
-        return jsonify({'success': False, 'message': 'Failed to send email'}), 500
+        return jsonify([])
+
+    item_type = items[item_id]['type']
+    matches = find_matches(item_id, item_type)
+    return jsonify(matches)
 
 @app.route('/contact', methods=['GET', 'POST'])
 def contact():

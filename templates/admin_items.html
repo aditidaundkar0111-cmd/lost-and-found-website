@@ -51,18 +51,28 @@
                     <td class="p-3">{{ item.location }}</td>
                     <td class="p-3 capitalize">{{ item.status }}</td>
                     <td class="p-3 space-x-2">
-                        {% if not item.verified %}
-                        <button onclick="verifyItem('{{ item.id }}')"
-                            class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
-                            Verify
-                        </button>
-                        <button onclick="rejectItem('{{ item.id }}')"
-                            class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
-                            Reject
-                        </button>
-                        {% else %}
-                        <span class="text-gray-500 text-sm">No actions</span>
-                        {% endif %}
+                        {% if item.status == 'pending' %}
+                            <button onclick="verifyItem('{{ item.id }}')"
+                                class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                                Verify
+                            </button>
+
+                            <button onclick="rejectItem('{{ item.id }}')"
+                                class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+                                Reject
+                            </button>
+
+                        {% elif item.status == 'active' %}
+                            <button onclick="viewMatches('{{ item.id }}')"
+                                class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                🔍 View Matches
+                            </button>
+
+                        {% elif item.status == 'matched' %}
+                            <span class="text-blue-600 font-semibold text-sm">
+                                🎉 Matched
+                            </span>
+                        {% endif %}                        
                     </td>
                 </tr>
                 {% endfor %}
@@ -87,10 +97,7 @@ function verifyItem(itemId) {
         .then(res => res.json())
         .then(data => {
             showMessage(data.message, data.success);
-            if (data.success) {
-                showMessage(data.message, true);
-                location.reload();
-            }
+            if (data.success) location.reload();
         });
 }
 
@@ -100,21 +107,64 @@ function rejectItem(itemId) {
         .then(res => res.json())
         .then(data => {
             showMessage(data.message, data.success);
-            if (data.success) {
-                showMessage(data.message, true);
-                location.reload();
-            }
+            if (data.success) location.reload();
         });
+}
+
+/* ---------- VIEW AI MATCHES ---------- */
+function viewMatches(itemId) {
+    fetch(`/api/admin/matches/${itemId}`)
+        .then(res => res.json())
+        .then(matches => {
+            if (!matches || matches.length === 0) {
+                alert("No AI matches found for this item.");
+                return;
+            }
+
+            let text = "AI Suggested Matches:\n\n";
+            matches.forEach((m, i) => {
+                text += `${i + 1}. ${m.name} | ${m.location} | ${m.score}%\n`;
+            });
+
+            const choice = prompt(
+                text + "\nEnter match number to CONFIRM (or Cancel):"
+            );
+
+            if (!choice) return;
+
+            const index = parseInt(choice) - 1;
+            if (index < 0 || index >= matches.length) {
+                alert("Invalid choice");
+                return;
+            }
+
+            confirmMatch(itemId, matches[index].item_id);
+        });
+}
+
+/* ---------- CONFIRM MATCH (EMAIL SENT HERE) ---------- */
+function confirmMatch(itemId, matchId) {
+    fetch(`/api/admin/confirm-match/${itemId}/${matchId}`, {
+        method: 'POST'
+    })
+    .then(res => res.json())
+    .then(data => {
+        showMessage(data.message, data.success);
+        if (data.success) location.reload();
+    });
 }
 
 /* ---------- MESSAGE HANDLER ---------- */
 function showMessage(text, success) {
     const msg = document.getElementById('adminMessage');
     msg.className = 'mb-4 p-3 rounded text-sm font-semibold text-center';
-    msg.classList.add(success ? 'bg-green-100 text-green-700'
-                              : 'bg-red-100 text-red-700');
+    msg.classList.add(
+        success ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-700'
+    );
     msg.textContent = text;
     msg.classList.remove('hidden');
 }
 </script>
+
 {% endblock %}

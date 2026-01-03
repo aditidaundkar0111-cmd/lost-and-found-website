@@ -1,255 +1,206 @@
-# Lost & Found Website
+📦 Lost & Found Website
 
-A modern, full-featured lost and found platform with AI-powered item matching, admin verification, and email notifications.
+A secure, admin-verified lost and found system with AI-assisted matching
 
-## Features
+📌 Project Overview
 
-✨ **Core Features:**
-- 🔐 User authentication (Login/Register)
-- 📝 Report lost or found items
-- 🔍 Browse verified items with advanced filters
-- 🤖 AI-powered item matching system
-- 📧 Email notifications for matches
-- ✅ Admin verification system
-- 📞 Contact form
-- 📊 Admin dashboard
+This project is a college-level Lost & Found web application designed to help users report, verify, and recover lost items safely.
+The system uses admin verification and AI-assisted matching to prevent false claims and ensure secure item handover.
 
-## Technology Stack
 
-- **Frontend:** HTML5, Tailwind CSS (responsive design via CDN)
-- **Backend:** Python Flask
-- **Database:** JSON files
-- **Email:** SMTP (Gmail)
-- **AI Matching:** String similarity algorithm
+✨ Key Features
 
-## Project Structure
+👤 User Features
+🔐 User Registration & Login
+📝 Report Lost or Found Items
+🔍 Browse Verified Items Only
+🤖 View AI-suggested matches (admin-controlled)
+📧 Email notifications after match confirmation
+📞 Contact support via contact form
 
-```
+
+🛡️ Admin Features
+
+✅ Verify or Reject reported items
+🔍 View AI-suggested item matches
+🤝 Manually confirm correct matches
+📧 Trigger email notifications after confirmation
+📊 Dashboard with item statistics
+
+
+🧠 Core System Logic (Very Important)
+
+Item Lifecycle
+pending → active → matched
+
+pending → Item reported by user (not public)
+active → Admin verified (visible to all users)
+matched → Admin confirmed match (emails sent)
+
+📌 There is NO automatic matching or auto-emailing
+📌 Admin always takes the final decision
+
+
+🛠️ Technology Stack
+
+Frontend: HTML5, Tailwind CSS
+Backend: Python (Flask)
+Database: JSON files
+AI Matching: String similarity (SequenceMatcher)
+Email: Gmail SMTP
+Authentication: Session-based login
+
+
+📂 Project Structure
 lost_found_website/
-├── app.py                 # Flask backend
-├── requirements.txt       # Python dependencies
-├── templates/            # HTML templates
-│   ├── base.html        # Base layout with navbar
-│   ├── index.html       # Home page
-│   ├── register.html    # Registration page
-│   ├── login.html       # Login page
-│   ├── browse.html      # Browse items page
-│   ├── report.html      # Report item page
-│   ├── contact.html     # Contact page
-│   ├── admin_dashboard.html  # Admin dashboard
-│   └── admin_items.html      # Admin item management
+├── app.py
+├── requirements.txt
+├── templates/
+│   ├── base.html
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── browse.html
+│   ├── report.html
+│   ├── contact.html
+│   ├── admin_dashboard.html
+│   └── admin_items.html
 ├── static/
-│   |--- uploads
-└── data/               # JSON database files
+│   └── uploads/
+└── data/
     ├── users.json
     ├── items.json
     ├── reports.json
     └── admins.json
-```
 
-## Installation & Setup
 
-### Prerequisites
-- Python 3.8 or higher
-- pip (Python package manager)
+🚀 Installation & Setup
 
-### Step 1: Clone/Download the Project
-```bash
-cd lost_found_website
-```
-
-### Step 2: Install Dependencies
-```bash
+Prerequisites
+Python 3.8+
+pip
+Step 1: Install Dependencies
 pip install -r requirements.txt
-```
 
-### Step 3: Configure Email (Optional)
-Edit `app.py` and update email configuration:
-```python
-EMAIL_ADDRESS = "your_email@gmail.com"
-EMAIL_PASSWORD = "your_app_password"
-```
+Step 2: Configure Email (.env)
+SECRET_KEY=your_secret_key
+EMAIL_ADDRESS=yourgmail@gmail.com
+EMAIL_PASSWORD=your_app_password
+📌 Gmail App Password is required (2FA enabled)
 
-To use Gmail:
-1. Enable 2-factor authentication on your Google account
-2. Generate an app password: https://myaccount.google.com/apppasswords
-3. Use the app password in the config
-
-### Step 4: Run the Application
-```bash
+Step 3: Run Application
 python app.py
-```
 
-The website will be available at: **http://localhost:5000**
+Access at:
+👉 http://localhost:5000
 
-## Default Admin Account
 
-- **Email:** admin@lostandfound.com
-- **Password:** admin123
+🔑 Default Admin Account
+Field	Value
+Email	admin@lostandfound.com
+Password	admin123
+📌 This is a system login ID, not an actual mailbox.
 
-⚠️ Change this in production!
+🔄 How the System Works
 
-## How to Use
+👤 User Flow
+Register / Login
+Report Lost or Found Item
+Item waits for admin verification
+Browse verified items
+Receive email after admin confirms match
 
-### For Regular Users:
-1. **Register/Login** - Create your account
-2. **Report Item** - Report a lost or found item
-3. **Browse** - Check other reported items
-4. **Get Notified** - Receive email when matches are found
 
-### For Admins:
-1. Login with admin credentials
-2. Go to **Admin Dashboard**
-3. Manage items and verify reports
-4. View statistics and system status
+🛡️ Admin Flow
 
-## Features Explained
+Login as Admin
+Verify or Reject items
+View AI-suggested matches
+Manually confirm correct match
+Emails sent to both users
+Item marked as matched
 
-### 🤖 AI Matching System
-Automatically matches items based on:
-- Item name similarity (40% weight)
-- Category match (30% weight)
-- Location similarity (20% weight)
-- Color match (10% weight)
 
-Items with >50% match score are suggested to users.
+🤖 AI Matching System
 
-### 📧 Email Notifications
-When a match is found, users receive an email with:
-- Potential match details
-- Matching percentage
-- Contact information
+AI suggests matches using:
+Name similarity (40%)
+Category match (30%)
+Location similarity (20%)
+Color match (10%)
+Only matches with >50% score are suggested.
+📌 AI assists admin, it does not decide automatically.
 
-### ✅ Admin Verification
-- All new reports require admin approval
-- Admins can verify or reject items
-- Prevents spam and false reports
-- Ensures platform authenticity
 
-## Database Structure
+📧 Email Notifications
 
-### Users (users.json)
-```json
-{
-  "user@example.com": {
-    "name": "User Name",
-    "password": "hashed_password",
-    "joined": "2025-12-27 10:30:00"
-  }
-}
-```
+Emails are sent only when admin confirms a match.
+No email on report
+No email on verification
+Email only after confirmation
+This ensures no false notifications.
 
-### Items (items.json)
-```json
+
+🗃️ Database Format
+items.json
 {
   "item_id": {
-    "name": "iPhone 14",
+    "name": "Charger",
     "type": "lost",
     "category": "Electronics",
-    "location": "Central Park",
+    "location": "Library",
     "color": "Black",
-    "description": "Black iPhone 14 Pro...",
+    "description": "Samsung charger",
     "reported_by": "user@example.com",
-    "date": "2025-12-27 10:30:00",
-    "verified": true,
+    "date": "2026-01-03 10:30:00",
     "status": "active"
   }
 }
-```
 
-## API Endpoints
+🌐 API Endpoints
 
-### Authentication
-- `POST /register` - Register new user
-- `POST /login` - Login user
-- `GET /logout` - Logout
+User
+POST /register
+POST /login
+GET /logout
+GET /browse
+POST /report
+GET /api/my-items
+GET /api/search
 
-### Items
-- `GET /browse` - Browse verified items
-- `POST /report` - Report new item
-- `GET /api/search` - Search with filters
-- `GET /api/my-items` - Get user's items
-- `GET /api/item/<id>/matches` - Get matches for item
+Admin
+GET /admin/dashboard
+GET /admin/items
+POST /api/admin/verify/<item_id>
+POST /api/admin/reject/<item_id>
+GET /api/admin/matches/<item_id>
+POST /api/admin/confirm-match/<item_id>/<match_id>
 
-### Admin
-- `GET /admin/dashboard` - Admin dashboard
-- `GET /admin/items` - Manage items
-- `POST /api/admin/verify/<id>` - Verify item
-- `POST /api/admin/reject/<id>` - Reject item
+Contact
+POST /contact
 
-### Other
-- `POST /contact` - Contact form
-- `POST /api/item/<id>/notify` - Send notification
 
-## Customization
+🎓 Academic Justification (Viva Ready)
 
-### Change Colors
-Edit the CSS variables in `static/css/style.css`:
-```css
-:root {
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
-    ...
-}
-```
+Admin verification prevents fake claims
+AI reduces manual effort
+Manual confirmation ensures safety
+Email only after verification avoids misuse
+JSON database used for simplicity
 
-### Modify Categories
-Edit the category options in:
-- `templates/report.html`
-- `templates/browse.html`
 
-### Adjust Matching Algorithm
-Modify the `find_matches()` function in `app.py` to change:
-- Similarity thresholds
-- Weight distribution
-- Matching criteria
+🚧 Known Limitations
 
-## Troubleshooting
+SMTP email is synchronous (may be slow)
+JSON database (not for production)
+AI is rule-based, not ML
 
-### Port 5000 already in use
-```bash
-python app.py --port 5001
-```
 
-### Emails not sending
-- Verify email configuration in `app.py`
-- Check Gmail app password
-- Verify firewall allows SMTP connections
+🔮 Future Enhancements
 
-### Database errors
-- Check permissions on `data/` folder
-- Ensure JSON files are not corrupted
-- Delete data files to reset
-
-## Future Enhancements
-
-- 📸 Image upload for items
-- 🗺️ Google Maps integration
-- 💬 Messaging between users
-- 🔔 Push notifications
-- 📱 Mobile app
-- 💳 Reward system
-- 🌐 Multi-language support
-- 🔒 Enhanced security features
-
-## License
-
-This project is open source and available for educational purposes.
-
-## Support
-
-For issues or questions:
-- Create an issue on GitHub
-- Contact: support@lostandfound.com
-
-## Contributing
-
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
-
----
-
-**Happy Finding! 🔍** Help reunite lost items with their owners.
+Async email queue
+Database (SQLite / MySQL)
+Image similarity matching
+College email restriction
+Mobile app
+Admin audit logs

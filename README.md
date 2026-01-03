@@ -1,128 +1,178 @@
-**📦 Lost & Found Website**
-A secure, admin-verified lost and found system with AI-assisted matching
+🔍 Lost & Found Website
 
-**📌 Project Overview**
-This project is a college-level Lost & Found web application designed to help users report, verify, and recover lost items safely.
-The system uses admin verification and AI-assisted matching to prevent false claims and ensure secure item handover.
+A secure, admin-verified **Lost & Found web application** with AI-assisted item matching and email notifications.
 
-**✨ Key Features**
-👤 User Features
-🔐 User Registration & Login
-📝 Report Lost or Found Items
-🔍 Browse Verified Items Only
-🤖 View AI-suggested matches (admin-controlled)
-📧 Email notifications after match confirmation
-📞 Contact support via contact form
+This project is designed for **academic use** and demonstrates a complete real-world workflow with admin control to prevent false claims.
 
+---
 
-**🛡️ Admin Features**
-✅ Verify or Reject reported items
-🔍 View AI-suggested item matches
-🤝 Manually confirm correct matches
-📧 Trigger email notifications after confirmation
-📊 Dashboard with item statistics
+## 📌 Project Overview
 
+The Lost & Found Website allows users to report lost or found items, while an admin verifies reports and confirms matches using an AI-assisted matching system.  
+Items are never matched automatically — **admin approval is mandatory** for safety and authenticity.
 
-**🧠 Core System Logic (Very Important)**
-Item Lifecycle
+---
+
+## ✨ Features
+
+### 👤 User Features
+- 🔐 User Registration & Login
+- 📝 Report Lost or Found Items
+- 🔍 Browse Verified Items Only
+- 📧 Receive Email Notification after Match Confirmation
+- 📞 Contact Support via Contact Form
+
+### 🛡️ Admin Features
+- ✅ Verify or Reject Reported Items
+- 🔍 View AI-Suggested Matches
+- 🤝 Manually Confirm Correct Matches
+- 📧 Trigger Email Notifications
+- 📊 Admin Dashboard with Statistics
+
+---
+
+## 🧠 Core Working Logic
+
+### Item Lifecycle
 pending → active → matched
 
-pending → Item reported by user (not public)
-active → Admin verified (visible to all users)
-matched → Admin confirmed match (emails sent)
+markdown
+Copy code
 
-📌 There is NO automatic matching or auto-emailing
-📌 Admin always takes the final decision
+- **pending** → Item reported by user (not visible publicly)
+- **active** → Admin verified (visible to all users)
+- **matched** → Admin confirmed match (emails sent)
 
-**🛠️ Technology Stack**
-Frontend: HTML5, Tailwind CSS
-Backend: Python (Flask)
-Database: JSON files
-AI Matching: String similarity (SequenceMatcher)
-Email: Gmail SMTP
-Authentication: Session-based login
+📌 AI suggests matches, **admin makes the final decision**.
 
-**📂 Project Structure**
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend:** HTML5, Tailwind CSS
+- **Backend:** Python (Flask)
+- **Database:** JSON files
+- **AI Matching:** String similarity algorithm
+- **Email Service:** Gmail SMTP
+- **Authentication:** Session-based login
+
+---
+
+## 📂 Project Structure
+
 lost_found_website/
 ├── app.py
 ├── requirements.txt
 ├── templates/
-│   ├── base.html
-│   ├── index.html
-│   ├── login.html
-│   ├── register.html
-│   ├── browse.html
-│   ├── report.html
-│   ├── contact.html
-│   ├── admin_dashboard.html
-│   └── admin_items.html
+│ ├── base.html
+│ ├── index.html
+│ ├── login.html
+│ ├── register.html
+│ ├── browse.html
+│ ├── report.html
+│ ├── contact.html
+│ ├── admin_dashboard.html
+│ └── admin_items.html
 ├── static/
-│   └── uploads/
+│ └── uploads/
 └── data/
-    ├── users.json
-    ├── items.json
-    ├── reports.json
-    └── admins.json
+├── users.json
+├── items.json
+├── reports.json
+└── admins.json
 
-**🚀 Installation & Setup**
-Prerequisites
-Python 3.8+
-pip
-Step 1: Install Dependencies
+yaml
+Copy code
+
+---
+
+## 🚀 Installation & Setup
+
+### Prerequisites
+- Python 3.8+
+- pip
+
+### Install Dependencies
+```bash
 pip install -r requirements.txt
+Configure Environment Variables
+Create a .env file (do NOT upload to GitHub):
 
-Step 2: Configure Email (.env)
+env
+Copy code
 SECRET_KEY=your_secret_key
 EMAIL_ADDRESS=yourgmail@gmail.com
-EMAIL_PASSWORD=your_app_password
-📌 Gmail App Password is required (2FA enabled)
+EMAIL_PASSWORD=your_gmail_app_password
+📌 Gmail App Password is required (2-Step Verification enabled).
 
-Step 3: Run Application
+Run the Application
+bash
+Copy code
 python app.py
-
-Access at:
+Access the website at:
 👉 http://localhost:5000
 
-**🔑 Default Admin Account**
+🔑 Default Admin Account
 Field	Value
 Email	admin@lostandfound.com
 Password	admin123
-📌 This is a system login ID, not an actual mailbox.
 
-**🔄 How the System Works**
-**👤 User Flow**
+📌 This is a system login ID, not an actual email inbox.
+
+🔄 How the System Works
+👤 User Flow
 Register / Login
+
 Report Lost or Found Item
+
 Item waits for admin verification
+
 Browse verified items
+
 Receive email after admin confirms match
 
-**🛡️ Admin Flow**
+🛡️ Admin Flow
 Login as Admin
+
 Verify or Reject items
+
 View AI-suggested matches
-Manually confirm correct match
+
+Confirm correct match
+
 Emails sent to both users
+
 Item marked as matched
 
-**🤖 AI Matching System**
-AI suggests matches using:
-Name similarity (40%)
+🤖 AI Matching System
+AI suggests matches based on:
+
+Item name similarity (40%)
+
 Category match (30%)
+
 Location similarity (20%)
+
 Color match (10%)
-Only matches with >50% score are suggested.
-📌 AI assists admin, it does not decide automatically.
 
-**📧 Email Notifications**
-Emails are sent only when admin confirms a match.
-No email on report
-No email on verification
-Email only after confirmation
-This ensures no false notifications.
+Only matches with more than 50% similarity score are suggested.
 
-**🗃️ Database Format**
-items.json
+📌 AI assists the admin — it does not auto-match items.
+
+📧 Email Notifications
+Emails are sent only after admin confirms a match:
+
+❌ No email on report
+
+❌ No email on verification
+
+✅ Email only after confirmation
+
+This prevents false notifications and misuse.
+
+🗃️ Database Format (items.json)
+json
+Copy code
 {
   "item_id": {
     "name": "Charger",
@@ -136,44 +186,65 @@ items.json
     "status": "active"
   }
 }
-
-**🌐 API Endpoints**
-**User**
+🌐 API Endpoints
+User
 POST /register
+
 POST /login
+
 GET /logout
+
 GET /browse
+
 POST /report
+
 GET /api/my-items
+
 GET /api/search
 
-**Admin**
+Admin
 GET /admin/dashboard
+
 GET /admin/items
+
 POST /api/admin/verify/<item_id>
+
 POST /api/admin/reject/<item_id>
+
 GET /api/admin/matches/<item_id>
+
 POST /api/admin/confirm-match/<item_id>/<match_id>
 
-**Contact**
+Contact
 POST /contact
 
-**🎓 Academic Justification** 
+🎓 Academic Justification
 Admin verification prevents fake claims
+
 AI reduces manual effort
+
 Manual confirmation ensures safety
-Email only after verification avoids misuse
+
+Email notifications are controlled
+
 JSON database used for simplicity
 
-**🚧 Known Limitations**
-SMTP email is synchronous (may be slow)
-JSON database (not for production)
-AI is rule-based, not ML
+🚧 Known Limitations
+SMTP email is synchronous (slight delay)
 
-**🔮 Future Enhancements**
-Async email queue
-Database (SQLite / MySQL)
-Image similarity matching
+JSON database (not production-ready)
+
+AI is rule-based (not ML)
+
+🔮 Future Enhancements
+Asynchronous email queue
+
+Database integration (SQLite / MySQL)
+
+Image-based similarity matching
+
 College email restriction
-Mobile app
+
+Mobile application
+
 Admin audit logs

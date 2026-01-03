@@ -59,7 +59,7 @@ Copy code
 ---
 
 ## 📂 Project Structure
-
+## 📁 Project Structure
 lost_found_website/
 ├── app.py
 ├── requirements.txt
@@ -80,9 +80,6 @@ lost_found_website/
 ├── items.json
 ├── reports.json
 └── admins.json
-
-yaml
-Copy code
 
 ---
 

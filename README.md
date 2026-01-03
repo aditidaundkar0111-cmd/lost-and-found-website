@@ -57,27 +57,27 @@ Authentication: Session-based login
 ---
 
 ## 📁 Project Structure
-
 lost_found_website/
 ├── app.py
 ├── requirements.txt
 ├── templates/
-│   ├── base.html
-│   ├── index.html
-│   ├── login.html
-│   ├── register.html
-│   ├── browse.html
-│   ├── report.html
-│   ├── contact.html
-│   ├── admin_dashboard.html
-│   └── admin_items.html
+│ ├── base.html
+│ ├── index.html
+│ ├── login.html
+│ ├── register.html
+│ ├── browse.html
+│ ├── report.html
+│ ├── contact.html
+│ ├── admin_dashboard.html
+│ └── admin_items.html
 ├── static/
-│   └── uploads/
+│ └── uploads/
 └── data/
-    ├── users.json
-    ├── items.json
-    ├── reports.json
-    └── admins.json
+├── users.json
+├── items.json
+├── reports.json
+└── admins.json
+Copy code
 
 ---
 
